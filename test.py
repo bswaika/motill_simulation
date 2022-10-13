@@ -17,4 +17,6 @@ for msg in bag.read_messages():
     starts[int(params['start'])].append(point)
     ends[int(params['end'])].append(point)
 
-print(len(starts[1]))
+# print(len(starts[1]))
+
+print(bag.get_type_and_topic_info())
