@@ -84,4 +84,4 @@ def run_sim():
             client.simRunConsoleCommand(CONSOLE_COMMAND.format(vehicle_name=drone, r=255 * r, g=255 * g, b=255 * b))
         frame += 1
         
-# run_sim()
+run_sim()
