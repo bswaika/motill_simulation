@@ -27,11 +27,22 @@ pcds = list(map(generate_point_cloud_from_frame, frames))
 start_pcd = pcds[0]
 start_bb = get_bounding_box(start_pcd)
 start_bb_min, start_bb_max = start_bb.get_min_bound(), start_bb.get_max_bound()
-# print(start_pcd)
+print(start_pcd)
 start_pcd = start_pcd.crop(o3d.geometry.AxisAlignedBoundingBox(min_bound=[start_bb_min[0], start_bb_min[1], 6 + start_bb_min[2]], max_bound=start_bb_max))
-# print(start_pcd)
+print(start_pcd)
 start_dpcd = start_pcd.voxel_down_sample(1.1)
 print(start_dpcd)
+
+###########################
+# Saving COMPRESSED PCD
+###########################
+# points = np.asarray(start_dpcd.points)
+# colors = np.asarray(start_dpcd.colors)
+# with open('compressed_pcds/0_points.npy', 'wb') as outfile:
+#     np.save(outfile, points)
+# with open('compressed_pcds/0_colors.npy', 'wb') as outfile:
+#     np.save(outfile, colors)
+###########################
 
 def run_sim():
     OFFSET = (0, 0, 6)
@@ -73,4 +84,4 @@ def run_sim():
             client.simRunConsoleCommand(CONSOLE_COMMAND.format(vehicle_name=drone, r=255 * r, g=255 * g, b=255 * b))
         frame += 1
         
-run_sim()
+# run_sim()
