@@ -4,7 +4,7 @@ from Client import Client
 from MotillOrchestrator import MotillOrchestrator
 from StagOrchestrator import StagOrchestrator
 from PathPlanners import APFPathPlanner
-from util import read_data
+from read_data import read_data
 
 if __name__ == '__main__':
     scenes = read_data()
