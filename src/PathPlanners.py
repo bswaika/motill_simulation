@@ -19,6 +19,7 @@ class APFPlannerParams:
     d_repulsion_out = 10
     k_repulsion_in = 300
     k_repulsion_out = 50
+    k_repulsion_bound = 1000
     power_factor = 3
     step_length = 2
     d_threshold = 2
