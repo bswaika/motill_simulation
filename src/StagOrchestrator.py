@@ -13,11 +13,14 @@ class StagOrchestrator(Orchestrator):
     FLIGHT_TIME = 30
     CHARGE_TIME = 10
     STATION_TOP_OFFSET = airsim.Vector3r(0, 0, -3)
-    STATION_BOUND_X = 5
+    STATION_BOUND_X = 4
     STATION_BOUND_Y = 10
-    STATION_GRID_X_INTERVAL = 1
-    STATION_GRID_Y_INTERVAL = 1
+    STATION_GRID_X_INTERVAL = 2
+    STATION_GRID_Y_INTERVAL = 2
     STATIONS = ['GroupActor_2', 'GroupActor_3', 'GroupActor_1', 'GroupActor_0']
+    BOUNDARY_CENTERS = ['Cube2', 'Cube3_1', 'Cube13', 'Cube14']
+    BOUNDARY_MAXS = ['Sphere_ymax_Cube2', 'Sphere_ymax_Cube3_1', 'Sphere_xmax_Cube13', 'Sphere_xmax_Cube14']
+    BOUNDARY_MINS = ['Sphere_ymin_Cube2', 'Sphere_ymin_Cube3_1', 'Sphere_xmin_Cube13', 'Sphere_xmin_Cube14']
 
     def __init__(self, client: Client, scene: PointCloud, planner: PathPlanner, standalone: bool=True, beta: int=FLIGHT_TIME, omega: int=CHARGE_TIME, delay: float=0) -> None:
         super().__init__()
@@ -40,6 +43,13 @@ class StagOrchestrator(Orchestrator):
 
     def _get_station_locations(self):
         return [self._client.simGetObjectPose(station).position + self.STATION_TOP_OFFSET for station in self.STATIONS]
+    
+    def _get_environment_bounds(self):
+        return {
+            'centers': [self._client.simGetObjectPose(bound).position.to_numpy_array() for bound in self.BOUNDARY_CENTERS], 
+            'maxs': [self._client.simGetObjectPose(bound).position.to_numpy_array() for bound in self.BOUNDARY_MAXS], 
+            'mins': [self._client.simGetObjectPose(bound).position.to_numpy_array() for bound in self.BOUNDARY_MINS]
+        }
 
     def _render_static_scene(self):
         for idx, (point, color) in enumerate(zip(self._scene.points, self._scene.colors)):
@@ -101,6 +111,8 @@ class StagOrchestrator(Orchestrator):
         self._illuminating, self._charging = self._sort(list(self._illuminating)), self._sort(list(self._charging))
         original = set(self._illuminating)
         idx = 0
+        self._planner.set_bounds(self._get_environment_bounds())
+        return
         while True:
             idx, sources, targets, obstacles = self._run_stag_exchange_loop(idx)
             self._planner.setup(sources, targets, obstacles)

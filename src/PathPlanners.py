@@ -1,13 +1,20 @@
 from copy import deepcopy
+from typing import List
 
 import numpy as np
 import airsim
 
 from interfaces import PathPlanner
 from Client import Client
+from DroneAnalyzer import DroneAnalyzer
+
+# BEST SO FAR (k_att 700 d_rep_in 1 k_rep_in 300)
+# BEST SO FAR (k_att 700 d_rep_in 1 k_rep_in 300)
+
+# Identify flying away from target and stuck in loop type of drones
 
 class APFPlannerParams:
-    k_attraction = 500
+    k_attraction = 700
     d_repulsion_in = 1
     d_repulsion_out = 10
     k_repulsion_in = 300
@@ -29,7 +36,14 @@ class APFPathPlanner(PathPlanner):
         self._client = client
         self._params = APFPlannerParams()
         self._no_change_threshold = 50
+        self._interception_steps = 15
         self._similar_swaps = similar_swaps_only
+        self._analyzer = DroneAnalyzer(self._client)
+        self._bounds = None
+
+    def set_bounds(self, bounds):
+        self._bounds = bounds
+        print(self._bounds)
 
     def _get_repulsive_force(self, source, target, obstacle):
         obstacle_dist, target_dist = np.linalg.norm(source - obstacle), np.linalg.norm(source - target)
@@ -52,7 +66,21 @@ class APFPathPlanner(PathPlanner):
         attractive_force = self._get_attractive_force(source, target)
         repulsive_force = np.sum(np.array([self._get_repulsive_force(source, target, obstacle).tolist() for obstacle in obstacles]), 0)
         return attractive_force + repulsive_force
+    
+    def _compute_outward_vector(self, drone):
+        outward_vector = deepcopy(self._client.drones[drone].position).to_numpy_array() - self._center_of_illumination
+        return  outward_vector / np.linalg.norm(outward_vector)
 
+    def _send_drones_near_center_outwards(self, drones):
+        outward_vectors = {}
+        for drone in drones:
+            outward_vectors[drone] = self._compute_outward_vector(drone)
+        sorted_drones = sorted([(drone, self._analyzer.compute_distance(self._client.drones[drone].position.to_numpy_array(), self._center_of_illumination)) for drone in drones], key=lambda x: x[1], reverse=True)
+        print(sorted_drones)
+        for _ in range(self._interception_steps):
+            for drone, _ in sorted_drones:
+                self._client.drones[drone].position = deepcopy(self._client.drones[drone].position) + airsim.Vector3r(*outward_vectors[drone])
+        
     def _step(self):
         for drone in self._sources:
             if drone not in self._reached:
@@ -100,11 +128,12 @@ class APFPathPlanner(PathPlanner):
                         if debug: all_exchanges.append((drone, to_exchange))
         if debug and all_exchanges: print(all_exchanges)
 
-    def setup(self, sources, targets, obstacles):
+    def setup(self, sources: dict, targets: dict, obstacles):
         self._sources = sources
         self._targets = targets
         self._obstacles = {obstacle: deepcopy(self._client.drones[obstacle].position).to_numpy_array() for obstacle in obstacles}
         self._reached = set()
+        self._center_of_illumination = self._analyzer.compute_center()
 
     def run_update_loop(self):
         step_counter, no_change_counter, prev_num_reached = 0, 0, 0
@@ -116,8 +145,16 @@ class APFPathPlanner(PathPlanner):
                 prev_num_reached = len(self._reached)
                 no_change_counter = 0
             if no_change_counter == self._no_change_threshold - 1:
+                remaining_drones = set(deepcopy(self._sources).keys()) - deepcopy(self._reached)
+                drones_close_to_source = self._analyzer.find_drones_very_close_to_source(remaining_drones, deepcopy(self._sources))
+                print(drones_close_to_source)
+                self._send_drones_near_center_outwards((drones_close_to_source[True] | drones_close_to_source[False]))
+                remaining_drones -= (drones_close_to_source[True] | drones_close_to_source[False])
+                drones_flying_away = self._analyzer.find_drones_flying_away_from_target(remaining_drones, deepcopy(self._targets))
+                print(drones_flying_away)
                 print('Invoke Traffic Manager -> Let it do its job')
                 prev_num_reached = len(self._reached)
                 no_change_counter = 0
+                # break
             print('Step #:', step_counter, '| # Reached:', len(self._reached), '| # Drones in Client:', len(self._client.drones.keys()))
             step_counter += 1

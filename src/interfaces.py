@@ -1,4 +1,8 @@
 from abc import ABC, abstractmethod
+from typing import List, Dict
+
+import numpy as np
+
 from PointCloud import PointCloud, PointCloudSequence
 
 class Parser(ABC):
@@ -17,6 +21,10 @@ class Orchestrator(ABC):
         '''Runs the simulation for the orchestrator'''
 
 class PathPlanner(ABC):
+    @abstractmethod
+    def set_bounds(self, bounds: Dict[str, List[np.ndarray]]):
+        '''Sets up environment boundaries'''
+
     @abstractmethod
     def setup(self, sources, targets, obstacles):
         '''Sets up the Planner with the various types of locations'''
