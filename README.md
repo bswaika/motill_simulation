@@ -5,7 +5,7 @@
 ## Instructions to Run
 
 Please follow these instructions to run the software:
-1. Install `AirSimFLS.zip` from this link
+1. Install `AirSimFLS.zip` from [this link](https://drive.google.com/drive/folders/ehaniHuRv9-NUkySfmIEMHceG1fui7mv?usp=share_link)
 2. Unzip and open unreal project
 3. Clone this repository
 4. Install packages listed in `requirements.txt`
@@ -20,7 +20,7 @@ Please follow these instructions to run the software:
      - Run `python main.py --scenario motill|stag|failure --host ip_addr` from inside the `/src` directory
    - `IMPORTANT:` After the code executes, click **Stop** in unreal editor
 
-There is a separate `playground.py` file for you to play around with the codebase.
+There is a separate `playground.py` file for you to play around with the codebase. Additionally, [this link](https://drive.google.com/drive/folders/1ehaniHuRv9-NUkySfmIEMHceG1fui7mv?usp=share_link) contains sample scenario clips in the `/Clips` directory.
 
 ## Milestones
 

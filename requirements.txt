@@ -1,0 +1,5 @@
+rosbag==1.14.3
+PyYAML==6.0
+open3d==0.15.2
+numpy==1.22.0
+airsim==1.8.1
