@@ -22,6 +22,16 @@ Please follow these instructions to run the software:
 
 There is a separate `playground.py` file for you to play around with the codebase.
 
+## Milestones
+
+- [x] Feasibility Check
+- [x] Motion Illumination 
+- [x] FLS Drone Design
+- [x] Charging Architecture Design
+- [x] STAG
+- [x] Failure Handling
+- [x] Analysis  
+
 ## Project Objective & Overview
 
 To realize the next generation of multimedia displays, or FLS (Flying Light Speck) displays, which are capable of rendering real or virtual 3-dimensional objects by occupying physical volumes in space, we need miniature UAVs that are only hundreds of micrometers in size and have one or more light sources which can be lit in different colors and brightness levels. However, such technology is still under open research, and their fabrication is difficult and expensive due to their small size. Therefore, to understand and analyze the different aspects involved in creating an FLS display, one has to resort to simulations in the present technology landscape.
