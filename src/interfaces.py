@@ -30,5 +30,5 @@ class PathPlanner(ABC):
         '''Sets up the Planner with the various types of locations'''
 
     @abstractmethod
-    def run_update_loop(self):
+    def run_update_loop(self, delay):
         '''Runs the update loop for path planning'''

@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import Tuple
 
 import airsim
@@ -12,6 +13,7 @@ class Drone:
         self._client = client
         self._color_command = 'ke ' + self._name + ' SetLightColor {r} {g} {b}'
         self._is_charging = charging
+        self.ignore_collisions = True
 
     @property
     def position(self):
@@ -37,7 +39,7 @@ class Drone:
     def position(self, pos: airsim.Vector3r):
         self._prev_position = self._curr_position
         self._curr_position = pos
-        self._client.simSetVehiclePose(airsim.Pose(self._curr_position - self._home_position), True, self._name)
+        self._client.simSetVehiclePose(airsim.Pose(self._curr_position - self._home_position), self.ignore_collisions, self._name)
     
     @color.setter
     def color(self, col: Tuple[int]):
@@ -48,5 +50,16 @@ class Drone:
     def is_charging(self):
         return self._is_charging
     
+    # def get_collision_on_move(self, pos: airsim.Vector3r):
+    #     current_position = deepcopy(self._curr_position)
+    #     self._client.simSetVehiclePose(airsim.Pose(pos - self._home_position), False, self._name)
+    #     collision_info = self._client.simGetCollisionInfo(self._name)
+    #     # print(collision_info)
+    #     self._client.simSetVehiclePose(airsim.Pose(current_position - self._home_position), True, self._name)
+    #     if collision_info.has_collided:
+    #         # print(collision_info)
+    #         return collision_info.object_name
+    #     return None
+
     def toggle_charging_status(self):
         self._is_charging = not self._is_charging

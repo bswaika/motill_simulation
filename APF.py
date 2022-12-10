@@ -90,3 +90,19 @@ if __name__ == '__main__':
 
     print('# reached:', reached)
     plt.show()
+
+
+    # def _get_boundary_repulsive_force(self, source):
+    #     if source[0] < self._bounds['x_min'] or source[0] > self._bounds['x_max']:
+    #         return self._params.k_repulsion_bound * np.array([
+    #             -min(abs(self._bounds['x_min'] - source[0]), abs(self._bounds['x_max'] - source[0])),
+    #             self._bounds['y_range_min'] + np.random.rand() * (self._bounds['y_range_max'] - self._bounds['y_range_min']),
+    #             self._bounds['z_min'] + np.random.rand() * (self._bounds['z_max'] - self._bounds['z_min'])
+    #         ])
+    #     elif source[1] < self._bounds['y_min'] or source[1] > self._bounds['y_max']:
+    #         return self._params.k_repulsion_bound * np.array([
+    #             self._bounds['x_range_min'] + np.random.rand() * (self._bounds['x_range_max'] - self._bounds['x_range_min']),
+    #             -min(abs(self._bounds['y_min'] - source[1]), abs(self._bounds['y_max'] - source[1])),
+    #             self._bounds['z_min'] + np.random.rand() * (self._bounds['z_max'] - self._bounds['z_min'])
+    #         ])
+    #     else: return np.zeros((3,))

@@ -9,20 +9,66 @@ from Client import Client
 from PointCloud import PointCloud
 from interfaces import PathPlanner
 
+# for rose --> round 1 (very laggy) --> 383 / 448
+# stag_static_3 --> 
+#    # round 0 --> 90/90
+#    # round 1 --> 90/90
+#    # round 2 --> 88/90
+#    # round 3 --> 89/90
+#    # round 4 --> 88/90
+#    # round 5 --> 90/90
+#    # round 6 --> 90/90
+#    # round 7 --> 88/90
+#    # round 8 --> 88/90
+#    # round 9 --> 89/90
+#    # round 10 --> 85/90
+#    # round 11 --> 90/90
+#    # round 12 --> 90/90
+#    # round 13 --> 90/90
+#    # round 14 --> 89/90
+#    # round 15 --> 90/90
+#    # round 16 --> 82/90
+#    # round 17 --> 81/90
+#    # round 18 --> 90/90
+#    # round 19 --> 90/90
+#    # round 20 --> 89/90
+#    # round 21 --> 90/90
+#    # round 22 --> 90/90
+#    # round 23 --> 89/90
+#    # round 24 --> 90/90
+#    # round 25 --> 90/90
+#    # round 26 --> 90/90
+#    # round 27 --> 79/90
+#    # round 28 --> 90/90
+#    # round 29 --> 90/90
+#    # round 30 --> 90/90
+#    # round 31 --> 90/90
+#    # round 32 --> 90/90
+#    # round 33 --> 90/90
+#    # round 34 --> 90/90
+#    # round 35 --> 90/90
+#    # round 36 --> 90/90
+#    # round 37 --> 80/90
+# stag_static --> 18 mins
+#    # round 0 --> 134/134
+#    # round 1 --> 120/134
+#    # round 2 --> 134/134
+#    # round 3 --> 134/134
+
 class StagOrchestrator(Orchestrator):
     FLIGHT_TIME = 30
     CHARGE_TIME = 10
     STATION_TOP_OFFSET = airsim.Vector3r(0, 0, -3)
-    STATION_BOUND_X = 4
+    STATION_BOUND_X = 5
     STATION_BOUND_Y = 10
     STATION_GRID_X_INTERVAL = 2
-    STATION_GRID_Y_INTERVAL = 2
+    STATION_GRID_Y_INTERVAL = 1
     STATIONS = ['GroupActor_2', 'GroupActor_3', 'GroupActor_1', 'GroupActor_0']
     BOUNDARY_CENTERS = ['Cube2', 'Cube3_1', 'Cube13', 'Cube14']
     BOUNDARY_MAXS = ['Sphere_ymax_Cube2', 'Sphere_ymax_Cube3_1', 'Sphere_xmax_Cube13', 'Sphere_xmax_Cube14']
     BOUNDARY_MINS = ['Sphere_ymin_Cube2', 'Sphere_ymin_Cube3_1', 'Sphere_xmin_Cube13', 'Sphere_xmin_Cube14']
 
-    def __init__(self, client: Client, scene: PointCloud, planner: PathPlanner, standalone: bool=True, beta: int=FLIGHT_TIME, omega: int=CHARGE_TIME, delay: float=0) -> None:
+    def __init__(self, client: Client, scene: PointCloud, planner: PathPlanner, standalone: bool=True, keep_color: bool=False, beta: int=FLIGHT_TIME, omega: int=CHARGE_TIME, delay: float=0) -> None:
         super().__init__()
         self._client = client
         self._scene = scene
@@ -37,6 +83,7 @@ class StagOrchestrator(Orchestrator):
         self._sort = lambda x: sorted(x, key=lambda y: int(y.split('_')[1]))
         self._planner = planner
         self._standalone = standalone
+        self._keep_color = keep_color
 
     def _get_next_id(self):
         return len(self._client.drones.keys())
@@ -82,8 +129,18 @@ class StagOrchestrator(Orchestrator):
                 station = 0
         time.sleep(self._delay)
 
+    def _toggle_charging_status(self, drones):
+        for drone in drones:
+            self._client.drones[drone].toggle_charging_status()
+            if self._client.drones[drone].is_charging() and not self._keep_color:
+                self._client.drones[drone].color = self._charge_color
+
+    def _change_color(self, colors):
+        for drone in colors:
+            self._client.drones[drone].color = colors[drone]
+
     def _run_stag_exchange_loop(self, idx, debug=False):
-        sources, targets = {}, {}
+        sources, targets, colors = {}, {}, {}
         obstacles = set(self._illuminating)
         for i in range(len(self._charging)):
             start_position = deepcopy(self._client.drones[self._illuminating[idx]].position)
@@ -92,6 +149,7 @@ class StagOrchestrator(Orchestrator):
             targets[self._illuminating[idx]] = end_position.to_numpy_array()
             sources[self._charging[i]] = end_position.to_numpy_array()
             targets[self._charging[i]] = start_position.to_numpy_array()
+            colors[self._charging[i]] = deepcopy(self._client.drones[self._illuminating[idx]].color)
             # obstacles -= {self._illuminating[idx]}
             # self._client.drones[self._illuminating[idx]].position = end_position
             # self._client.drones[self._charging[i]].position = start_position
@@ -100,7 +158,7 @@ class StagOrchestrator(Orchestrator):
             if debug: print(f'Post-Exchange: {self._illuminating[idx]} {self._client.drones[self._illuminating[idx]].position.to_numpy_array().tolist()} {self._client.drones[self._charging[i]].position.to_numpy_array().tolist()} {self._charging[i]}')
             idx += 1
             if idx == len(self._illuminating): idx = 0
-        return idx, sources, targets, obstacles
+        return idx, sources, targets, obstacles, colors
 
     def run(self):
         if self._standalone:
@@ -112,13 +170,18 @@ class StagOrchestrator(Orchestrator):
         original = set(self._illuminating)
         idx = 0
         self._planner.set_bounds(self._get_environment_bounds())
-        return
+        change_counter = 0
         while True:
-            idx, sources, targets, obstacles = self._run_stag_exchange_loop(idx)
+            idx, sources, targets, obstacles, colors = self._run_stag_exchange_loop(idx)
             self._planner.setup(sources, targets, obstacles)
             self._planner.run_update_loop()
-            break
+            self._toggle_charging_status(sources)
+            if not self._keep_color: self._change_color(colors)
+            change_counter += 1
+            print(f'Loop {change_counter} completed...')
+            # break
             time.sleep((self._stag_interval * 10))
             if set(self._illuminating) == original and self._standalone:
-                    break
+                print('Done...')    
+                break
         
