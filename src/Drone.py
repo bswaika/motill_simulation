@@ -49,17 +49,6 @@ class Drone:
 
     def is_charging(self):
         return self._is_charging
-    
-    # def get_collision_on_move(self, pos: airsim.Vector3r):
-    #     current_position = deepcopy(self._curr_position)
-    #     self._client.simSetVehiclePose(airsim.Pose(pos - self._home_position), False, self._name)
-    #     collision_info = self._client.simGetCollisionInfo(self._name)
-    #     # print(collision_info)
-    #     self._client.simSetVehiclePose(airsim.Pose(current_position - self._home_position), True, self._name)
-    #     if collision_info.has_collided:
-    #         # print(collision_info)
-    #         return collision_info.object_name
-    #     return None
 
     def toggle_charging_status(self):
         self._is_charging = not self._is_charging

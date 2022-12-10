@@ -9,52 +9,6 @@ from Client import Client
 from PointCloud import PointCloud
 from interfaces import PathPlanner
 
-# for rose --> round 1 (very laggy) --> 383 / 448
-# stag_static_3 --> 
-#    # round 0 --> 90/90
-#    # round 1 --> 90/90
-#    # round 2 --> 88/90
-#    # round 3 --> 89/90
-#    # round 4 --> 88/90
-#    # round 5 --> 90/90
-#    # round 6 --> 90/90
-#    # round 7 --> 88/90
-#    # round 8 --> 88/90
-#    # round 9 --> 89/90
-#    # round 10 --> 85/90
-#    # round 11 --> 90/90
-#    # round 12 --> 90/90
-#    # round 13 --> 90/90
-#    # round 14 --> 89/90
-#    # round 15 --> 90/90
-#    # round 16 --> 82/90
-#    # round 17 --> 81/90
-#    # round 18 --> 90/90
-#    # round 19 --> 90/90
-#    # round 20 --> 89/90
-#    # round 21 --> 90/90
-#    # round 22 --> 90/90
-#    # round 23 --> 89/90
-#    # round 24 --> 90/90
-#    # round 25 --> 90/90
-#    # round 26 --> 90/90
-#    # round 27 --> 79/90
-#    # round 28 --> 90/90
-#    # round 29 --> 90/90
-#    # round 30 --> 90/90
-#    # round 31 --> 90/90
-#    # round 32 --> 90/90
-#    # round 33 --> 90/90
-#    # round 34 --> 90/90
-#    # round 35 --> 90/90
-#    # round 36 --> 90/90
-#    # round 37 --> 80/90
-# stag_static --> 18 mins
-#    # round 0 --> 134/134
-#    # round 1 --> 120/134
-#    # round 2 --> 134/134
-#    # round 3 --> 134/134
-
 class StagOrchestrator(Orchestrator):
     FLIGHT_TIME = 30
     CHARGE_TIME = 10
@@ -150,9 +104,6 @@ class StagOrchestrator(Orchestrator):
             sources[self._charging[i]] = end_position.to_numpy_array()
             targets[self._charging[i]] = start_position.to_numpy_array()
             colors[self._charging[i]] = deepcopy(self._client.drones[self._illuminating[idx]].color)
-            # obstacles -= {self._illuminating[idx]}
-            # self._client.drones[self._illuminating[idx]].position = end_position
-            # self._client.drones[self._charging[i]].position = start_position
             if debug: print(f'Pre-Exchange: {self._illuminating[idx]} {start_position.to_numpy_array().tolist()} {end_position.to_numpy_array().tolist()} {self._charging[i]}')
             self._charging[i], self._illuminating[idx] = self._illuminating[idx], self._charging[i]
             if debug: print(f'Post-Exchange: {self._illuminating[idx]} {self._client.drones[self._illuminating[idx]].position.to_numpy_array().tolist()} {self._client.drones[self._charging[i]].position.to_numpy_array().tolist()} {self._charging[i]}')
