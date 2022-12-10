@@ -5,8 +5,8 @@
 ## Instructions to Run
 
 Please follow these instructions to run the software:
-1. Install `AirSimFLS.zip` from [this link](https://drive.google.com/drive/folders/ehaniHuRv9-NUkySfmIEMHceG1fui7mv?usp=share_link)
-2. Unzip and open unreal project
+1. Download `AirSimFLS.zip` from [this link](https://drive.google.com/drive/folders/1ehaniHuRv9-NUkySfmIEMHceG1fui7mv?usp=share_link)
+2. Unzip and open `AirSimFLS.uproject` in unreal editor
 3. Clone this repository
 4. Install packages listed in `requirements.txt`
 5. Navigate to `/src` in the command line relative to the project directory
