@@ -1,0 +1,20 @@
+{
+  "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings.md",
+  "SettingsVersion": 1.2,
+  "ClockSpeed": 1,
+  "LogMessagesVisible": false,
+  "RecordUIVisible": false,
+  "PhysicsEngineName": "ExternalPhysicsEngine",
+  "SimMode": "Multirotor",
+  "PawnPaths": {
+    "FLSDronePawn": {
+      "PawnBP": "Class'/Game/BP_FLS.BP_FLS_C'"
+    }
+  },
+  "Vehicles": {
+    "FLSDrone": {
+      "VehicleType": "SimpleFlight",
+      "PawnPath": "FLSDronePawn"
+    }
+  }
+}

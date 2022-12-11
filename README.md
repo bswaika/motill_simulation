@@ -5,12 +5,14 @@
 ## Instructions to Run
 
 Please follow these instructions to run the software:
-1. Download `AirSimFLS.zip` from [this link](https://drive.google.com/drive/folders/1ehaniHuRv9-NUkySfmIEMHceG1fui7mv?usp=share_link)
-2. Unzip and open `AirSimFLS.uproject` in unreal editor
-3. Clone this repository
-4. Install packages listed in `requirements.txt`
-5. Navigate to `/src` in the command line relative to the project directory
-6. For every scenario i.e, MOTILL, STAG and FAILURE HANDLING
+1. Install `Unreal Engine` and `AirSim` by following [this guide for windows](https://microsoft.github.io/AirSim/build_windows). Please follow their instructions if on a different OS.
+2. Download `AirSimFLS.zip` from [this link](https://drive.google.com/drive/folders/1ehaniHuRv9-NUkySfmIEMHceG1fui7mv?usp=share_link)
+3. Unzip and open `AirSimFLS.uproject` in unreal editor
+4. Clone this repository
+5. Find and replace the `settings.json` provided by AirSim on your PC with `/settings.json` in this repository
+6. Install packages listed in `requirements.txt`
+7. Navigate to `/src` in the command line relative to the project directory
+8. For every scenario i.e, MOTILL, STAG and FAILURE HANDLING
    - Click **Play** in unreal editor
    - If running on Windows/Mac/Linux:
      - Run `python main.py --scenario motill|stag|failure` from inside the `/src` directory
@@ -18,7 +20,7 @@ Please follow these instructions to run the software:
      - From the command-line run `cat /etc/resolv.conf`
      - Copy the IP Address
      - Run `python main.py --scenario motill|stag|failure --host ip_addr` from inside the `/src` directory
-   - `IMPORTANT:` After the code executes, click **Stop** in unreal editor
+   - `IMPORTANT:` After the code executes, click **Stop** in unreal editor before executing new code
 
 There is a separate `playground.py` file for you to play around with the codebase. Additionally, [this link](https://drive.google.com/drive/folders/1ehaniHuRv9-NUkySfmIEMHceG1fui7mv?usp=share_link) contains sample scenario clips in the `/Clips` directory.
 
