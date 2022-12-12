@@ -18,7 +18,7 @@ def motill_scenario(scenes, client, planner):
     orchestrator.run()
 
 def stag_scenario(scenes, client, planner):
-    orchestrator = StagOrchestrator(client, scenes['stag_static'], planner, delay=1)
+    orchestrator = StagOrchestrator(client, scenes['stag_rose_cropped'], planner, delay=1)
     orchestrator.run()
 
 def failure_scenario(scenes, client, planner):

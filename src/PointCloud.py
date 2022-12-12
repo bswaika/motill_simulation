@@ -14,6 +14,37 @@ class PointCloud:
         pcd.colors = o3d.utility.Vector3dVector(self.colors)
         pcd = pcd.voxel_down_sample(factor)
         return PointCloud(np.asarray(pcd.points), np.asarray(pcd.colors))
+
+    def crop_along_z_till_end(self, offset, start=True):
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(self.points)
+        pcd.colors = o3d.utility.Vector3dVector(self.colors)
+        bbox = self.get_bbox(pcd)
+        bb_min, bb_max = bbox.get_min_bound(), bbox.get_max_bound()
+        if not start:
+            pcd = pcd.crop(o3d.geometry.AxisAlignedBoundingBox(min_bound=[bb_min[0], bb_min[1], bb_max[2]-offset], max_bound=bb_max))
+        else:
+            pcd = pcd.crop(o3d.geometry.AxisAlignedBoundingBox(min_bound=[bb_min[0], bb_min[1], bb_min[2]+offset], max_bound=bb_max))
+        return PointCloud(np.asarray(pcd.points), np.asarray(pcd.colors))
+
+    def translate_along_z(self, offset):
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(self.points)
+        pcd.colors = o3d.utility.Vector3dVector(self.colors)
+        pcd = pcd.translate((0, 0, offset))
+        return PointCloud(np.asarray(pcd.points), np.asarray(pcd.colors))
+
+    def save_as_npy_file(self, path):
+        points = np.array(self.points)
+        colors = np.array(self.colors)
+        with open(f'{path}_points.npy', 'wb') as outfile:
+            np.save(outfile, points)
+        with open(f'{path}_colors.npy', 'wb') as outfile:
+            np.save(outfile, colors)
+
+    def get_bbox(self, pc):
+        return o3d.geometry.AxisAlignedBoundingBox.create_from_points(pc.points)
+
     
     def uniform_downsample(self, skip):
         return PointCloud(self.points[::skip, :], self.colors[::skip, :])

@@ -21,7 +21,8 @@ if __name__ == '__main__':
     stag = {
         'stag_static': scenes['motion'].downsample(10)[50],
         'stag_static_2': scenes['motion'][50].voxel_downsample(0.8),
-        'stag_static_3': scenes['motion'][50].voxel_downsample(0.6)
+        'stag_static_3': scenes['motion'][50].voxel_downsample(0.6),
+        'stag_rose_cropped': motill['motill_static'].crop_along_z_till_end(14, False).translate_along_z(-8)
     }
 
     files = set(os.listdir('../data'))
